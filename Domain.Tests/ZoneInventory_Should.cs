@@ -16,5 +16,16 @@ namespace Domain.Tests
             
             Check.That(events).ContainsExactly(new ZoneInventoryStarted(zoneId));
         }
+        
+        [Fact]
+        public void ReturnNothing_WhenStartInventoryAnAlreadyStartedInventory()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId));
+            
+            var events = zoneInventory.Start(zoneId);
+            
+            Check.That(events).IsEmpty();
+        }
     }
 }
