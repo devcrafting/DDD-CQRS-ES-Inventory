@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Domain
+namespace Domain.ZoneInventories
 {
     public class ZoneInventory
     {
