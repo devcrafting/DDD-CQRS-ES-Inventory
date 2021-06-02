@@ -13,8 +13,11 @@ namespace Domain.InventoryConsolidations
 
         public IEnumerable<IDomainEvent> Analyze(QuantityNotExpected quantityNotExpected)
         {
-            yield return new MissingItemDetected(quantityNotExpected.ExpectedItem.ItemId,
-                quantityNotExpected.ExpectedItem.Quantity - quantityNotExpected.Quantity);
+            var quantityDiff = quantityNotExpected.ExpectedItem.Quantity - quantityNotExpected.Quantity;
+            if (quantityDiff > 0)
+                yield return new MissingItemDetected(quantityNotExpected.ExpectedItem.ItemId, quantityDiff);
+            else
+                yield return new ItemDiscovered(quantityNotExpected.ExpectedItem.ItemId, -quantityDiff);
         }
     }
 }

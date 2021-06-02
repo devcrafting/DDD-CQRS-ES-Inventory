@@ -45,5 +45,23 @@ namespace Domain.Tests
             Check.That(events).ContainsExactly(
                 new MissingItemDetected(expectedItem.ItemId, expectedItem.Quantity - foundQuantity));
         }
+        
+        [Fact]
+        public void ReturnItemDiscovered_WhenReceivingQuantityNotExpectedWithHigherQuantity()
+        {
+            var inventoryConsolidation = new InventoryConsolidation();
+            var zoneId = Guid.NewGuid().ToString();
+            var locationId = Guid.NewGuid().ToString();
+            var expectedItemId = Guid.NewGuid().ToString();
+            var expectedItem = new ExpectedItem(locationId, expectedItemId, 3);
+            
+            var foundQuantity = 4;
+            var quantityNotExpected = new QuantityNotExpected(zoneId, expectedItem, foundQuantity);
+
+            var events = inventoryConsolidation.Analyze(quantityNotExpected);
+
+            Check.That(events).ContainsExactly(
+                new ItemDiscovered(expectedItem.ItemId, foundQuantity - expectedItem.Quantity));
+        }
     }
 }
