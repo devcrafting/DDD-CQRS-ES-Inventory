@@ -24,8 +24,8 @@ namespace Domain.Tests
             var events = inventoryConsolidation.Analyze(itemNotExpected);
 
             Check.That(events).ContainsExactly(
-                new MissingItemDetected(expectedItem.ItemId, expectedItem.Quantity),
-                new ItemDiscovered(foundItemId, foundQuantity));
+                new MissingItemDetected(locationId, expectedItem.ItemId, expectedItem.Quantity),
+                new ItemDiscovered(locationId, foundItemId, foundQuantity));
         }
         
         [Fact]
@@ -43,7 +43,7 @@ namespace Domain.Tests
             var events = inventoryConsolidation.Analyze(quantityNotExpected);
 
             Check.That(events).ContainsExactly(
-                new MissingItemDetected(expectedItem.ItemId, expectedItem.Quantity - foundQuantity));
+                new MissingItemDetected(locationId, expectedItem.ItemId, expectedItem.Quantity - foundQuantity));
         }
         
         [Fact]
@@ -61,7 +61,26 @@ namespace Domain.Tests
             var events = inventoryConsolidation.Analyze(quantityNotExpected);
 
             Check.That(events).ContainsExactly(
-                new ItemDiscovered(expectedItem.ItemId, foundQuantity - expectedItem.Quantity));
+                new ItemDiscovered(locationId, expectedItem.ItemId, foundQuantity - expectedItem.Quantity));
+        }
+        
+        [Fact]
+        public void ReturnItemFoundInAnotherLocation_WhenReceivingItemNotExpectedFoundWithMissingSameItemInAnotherLocation()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var locationId = Guid.NewGuid().ToString();
+            var itemId = Guid.NewGuid().ToString();
+            var inventoryConsolidation = new InventoryConsolidation(
+                new MissingItemDetected(locationId, itemId, 3));
+            var foundQuantity = 2;
+            var anotherLocationId = Guid.NewGuid().ToString();
+            var expectedItem = new ExpectedItem(anotherLocationId, itemId, 3);
+            var itemNotExpected = new ItemNotExpected(zoneId, expectedItem, itemId, foundQuantity);
+
+            var events = inventoryConsolidation.Analyze(itemNotExpected);
+
+            Check.That(events).ContainsExactly(
+                new ItemFoundInAnotherLocation(expectedItem.ItemId, foundQuantity, locationId, anotherLocationId));
         }
     }
 }
