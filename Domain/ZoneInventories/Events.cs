@@ -1,9 +1,5 @@
 namespace Domain.ZoneInventories
 {
-    public interface IDomainEvent
-    {
-    }
-    
     public record ZoneInventoryStarted(string ZoneId, params ExpectedItem[] ExpectedItems) : IDomainEvent;
 
     public record LocationScanned(string ZoneId, string LocationId) : IDomainEvent;
