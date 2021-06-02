@@ -60,7 +60,9 @@ namespace Domain
             
             var expectedItem = _expectedItems.Single(x => x.LocationId == _lastLocationScanned);
             if (expectedItem.ItemId != itemId)
-                yield return new ItemNotExpected(_zoneId, _lastLocationScanned, itemId, quantity, expectedItem);
+                yield return new ItemNotExpected(_zoneId, expectedItem, itemId, quantity);
+            else if (expectedItem.Quantity != quantity)
+                yield return new QuantityNotExpected(_zoneId, expectedItem, quantity);
             else
                 yield return new ItemScanned(_zoneId, _lastLocationScanned, itemId, quantity);
         }

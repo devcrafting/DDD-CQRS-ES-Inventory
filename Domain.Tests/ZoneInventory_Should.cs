@@ -99,7 +99,27 @@ namespace Domain.Tests
             var events = zoneInventory.ScanItem(itemId, quantity);
             
             Check.That(events).ContainsExactly(
-                new ItemNotExpected(zoneId, locationId, itemId, quantity, expectedItem));
+                new ItemNotExpected(zoneId, expectedItem, itemId, quantity));
+        }
+        
+        [Fact]
+        public void ReturnQuantityNotExpected_WhenScanItem()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var locationId = Guid.NewGuid().ToString();
+            var itemId = Guid.NewGuid().ToString();
+            var expectedQuantity = 3;
+            var expectedItem = new ExpectedItem(locationId, itemId, expectedQuantity);
+            var zoneInventory = new ZoneInventory(
+                new ZoneInventoryStarted(zoneId, 
+                    expectedItem),
+                new LocationScanned(zoneId, locationId));
+            var notExpectedQuantity = 2;
+            
+            var events = zoneInventory.ScanItem(itemId, notExpectedQuantity);
+            
+            Check.That(events).ContainsExactly(
+                new QuantityNotExpected(zoneId, expectedItem, notExpectedQuantity));
         }
     }
 }

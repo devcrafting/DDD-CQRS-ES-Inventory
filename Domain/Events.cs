@@ -10,5 +10,7 @@ namespace Domain
 
     public record ItemScanned(string ZoneId, string LocationId, string ItemId, int Quantity) : IDomainEvent;
     
-    public record ItemNotExpected(string ZoneId, string LocationId, string ItemId, int Quantity, ExpectedItem ExpectedItem) : IDomainEvent;
+    public record ItemNotExpected(string ZoneId, ExpectedItem ExpectedItem, string ItemId, int Quantity) : IDomainEvent;
+    
+    public record QuantityNotExpected(string ZoneId, ExpectedItem ExpectedItem, int Quantity) : IDomainEvent;
 }
