@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NFluent;
 using Xunit;
 
@@ -26,6 +27,18 @@ namespace Domain.Tests
             var events = zoneInventory.Start(zoneId);
             
             Check.That(events).IsEmpty();
+        }
+
+        [Fact]
+        public void ReturnLocationScanned_WhenScanLocation()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId));
+            var locationId = Guid.NewGuid().ToString();
+            
+            var events = zoneInventory.ScanLocation(locationId);
+            
+            Check.That(events).ContainsExactly(new LocationScanned(zoneId, locationId));
         }
     }
 }

@@ -7,10 +7,12 @@ namespace Domain
     {
         private readonly Dictionary<Type, Action<IDomainEvent>> _evolveByEventType = new();
         
+        private string _zoneId;
         private bool _started;
 
         private void Evolve(ZoneInventoryStarted @event)
         {
+            _zoneId = @event.ZoneId;
             _started = true;
         }
 
@@ -32,6 +34,11 @@ namespace Domain
         {
             if (!_started)
                 yield return new ZoneInventoryStarted(zoneId);
+        }
+
+        public IEnumerable<IDomainEvent> ScanLocation(string locationId)
+        {
+            yield return new LocationScanned(_zoneId, locationId);
         }
     }
 }

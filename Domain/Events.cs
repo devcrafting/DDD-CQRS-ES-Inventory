@@ -5,4 +5,6 @@ namespace Domain
     }
     
     public record ZoneInventoryStarted(string ZoneId) : IDomainEvent;
+
+    public record LocationScanned(string ZoneId, string LocationId) : IDomainEvent;
 }
