@@ -38,6 +38,8 @@ namespace Domain
 
         public IEnumerable<IDomainEvent> ScanLocation(string locationId)
         {
+            if (!_started)
+                throw new NotStartedInventory();
             yield return new LocationScanned(_zoneId, locationId);
         }
     }

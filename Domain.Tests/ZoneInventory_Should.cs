@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NFluent;
 using Xunit;
 
@@ -39,6 +40,16 @@ namespace Domain.Tests
             var events = zoneInventory.ScanLocation(locationId);
             
             Check.That(events).ContainsExactly(new LocationScanned(zoneId, locationId));
+        }
+
+        [Fact]
+        public void ThrowException_WhenScanLocationOnNotStartedInventory()
+        {
+            var zoneInventory = new ZoneInventory();
+            var locationId = Guid.NewGuid().ToString();
+            
+            Check.ThatCode(() => zoneInventory.ScanLocation(locationId).ToList())
+                .Throws<NotStartedInventory>();
         }
     }
 }
