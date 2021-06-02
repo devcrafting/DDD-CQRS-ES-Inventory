@@ -57,11 +57,12 @@ namespace Domain.Tests
         {
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
-            var zoneInventory = new ZoneInventory(
-                new ZoneInventoryStarted(zoneId),
-                new LocationScanned(zoneId, locationId));
             var itemId = Guid.NewGuid().ToString();
             var quantity = 3;
+            var zoneInventory = new ZoneInventory(
+                new ZoneInventoryStarted(zoneId, 
+                    new ExpectedItem(locationId, itemId, quantity)),
+                new LocationScanned(zoneId, locationId));
             
             var events = zoneInventory.ScanItem(itemId, quantity);
             
@@ -80,6 +81,25 @@ namespace Domain.Tests
             
             Check.ThatCode(() => zoneInventory.ScanItem(itemId, quantity).ToList())
                 .Throws<NoLocationScanned>();
+        }
+        
+        [Fact]
+        public void ReturnItemNotExpected_WhenScanItem()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var locationId = Guid.NewGuid().ToString();
+            var expectedItemId = Guid.NewGuid().ToString();
+            var expectedItem = new ExpectedItem(locationId, expectedItemId, 3);
+            var zoneInventory = new ZoneInventory(
+                new ZoneInventoryStarted(zoneId, expectedItem),
+                new LocationScanned(zoneId, locationId));
+            var itemId = Guid.NewGuid().ToString();
+            var quantity = 3;
+            
+            var events = zoneInventory.ScanItem(itemId, quantity);
+            
+            Check.That(events).ContainsExactly(
+                new ItemNotExpected(zoneId, locationId, itemId, quantity, expectedItem));
         }
     }
 }

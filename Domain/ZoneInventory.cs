@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain
 {
@@ -10,6 +11,7 @@ namespace Domain
         private string _zoneId;
         private bool _started;
         private string _lastLocationScanned;
+        private IEnumerable<ExpectedItem> _expectedItems;
 
         private void Register<TEvent>(Action<TEvent> evolve) where TEvent : class
         {
@@ -30,6 +32,7 @@ namespace Domain
         {
             _zoneId = @event.ZoneId;
             _started = true;
+            _expectedItems = @event.ExpectedItems ?? Array.Empty<ExpectedItem>();
         }
 
         private void Evolve(LocationScanned @event)
@@ -54,7 +57,12 @@ namespace Domain
         {
             if (_lastLocationScanned == null)
                 throw new NoLocationScanned();
-            yield return new ItemScanned(_zoneId, _lastLocationScanned, itemId, quantity);
+            
+            var expectedItem = _expectedItems.Single(x => x.LocationId == _lastLocationScanned);
+            if (expectedItem.ItemId != itemId)
+                yield return new ItemNotExpected(_zoneId, _lastLocationScanned, itemId, quantity, expectedItem);
+            else
+                yield return new ItemScanned(_zoneId, _lastLocationScanned, itemId, quantity);
         }
     }
 }
