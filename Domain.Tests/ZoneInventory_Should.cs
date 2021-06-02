@@ -51,5 +51,35 @@ namespace Domain.Tests
             Check.ThatCode(() => zoneInventory.ScanLocation(locationId).ToList())
                 .Throws<NotStartedInventory>();
         }
+        
+        [Fact]
+        public void ReturnItemScanned_WhenScanItem()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var locationId = Guid.NewGuid().ToString();
+            var zoneInventory = new ZoneInventory(
+                new ZoneInventoryStarted(zoneId),
+                new LocationScanned(zoneId, locationId));
+            var itemId = Guid.NewGuid().ToString();
+            var quantity = 3;
+            
+            var events = zoneInventory.ScanItem(itemId, quantity);
+            
+            Check.That(events).ContainsExactly(
+                new ItemScanned(zoneId, locationId, itemId, quantity));
+        }
+        
+        [Fact]
+        public void ThrowNoLocationScanned_WhenScanItemWithoutLastLocationScanned()
+        {
+            var zoneId = Guid.NewGuid().ToString();
+            var zoneInventory = new ZoneInventory(
+                new ZoneInventoryStarted(zoneId));
+            var itemId = Guid.NewGuid().ToString();
+            var quantity = 3;
+            
+            Check.ThatCode(() => zoneInventory.ScanItem(itemId, quantity).ToList())
+                .Throws<NoLocationScanned>();
+        }
     }
 }
