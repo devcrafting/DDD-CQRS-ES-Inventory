@@ -14,9 +14,9 @@ namespace Infra.Controllers
 
         public void StartInventory(string zoneId)
         {
-            var zoneInventory = _repository.Get(zoneId);
-            var events = zoneInventory.Start(zoneId);
-            _repository.Save(zoneId, events);
+            var zoneInventory = _repository.Get(zoneId); // get data required
+            var events = zoneInventory.Start(zoneId); // pure logic
+            _repository.Save(zoneId, events); // save data (incl. publish events)
         }
     }
 }
