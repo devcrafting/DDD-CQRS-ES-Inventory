@@ -14,4 +14,4 @@ Demonstrate an example of implementation of :
   - Save events for the Aggregate (store then publish events with PubSub)
   NB : differs a bit from training where we says that PubSub store then call subscribers/handlers, here PubSub only call handlers, it is called by Aggregate Repository
 
-PubSub is typically configured as singleton in startup/bootstrap code, with registration of subscribers : projections handlers and business handlers (1 example in ConsolidationProcess).
+PubSub is typically configured as singleton in startup/bootstrap code, with registration of subscribers : projections handlers (example in ZoneInventoriesLocations = Query) and business handlers (1 example in ConsolidationProcess).
