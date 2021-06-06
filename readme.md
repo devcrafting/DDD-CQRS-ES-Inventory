@@ -11,5 +11,7 @@ Demonstrate an example of implementation of :
 - Fake web controller that
   - Gets Aggregate from database => not depending on state or event sourcing storage
   - Call method on Aggregate (command domain logic) => return events
-  - Save events for the Aggregate (store then publish events)
+  - Save events for the Aggregate (store then publish events with PubSub)
   NB : differs a bit from training where we says that PubSub store then call subscribers/handlers, here PubSub only call handlers, it is called by Aggregate Repository
+
+PubSub is typically configured as singleton in startup/bootstrap code, with registration of subscribers : projections handlers and business handlers (1 example in ConsolidationProcess).

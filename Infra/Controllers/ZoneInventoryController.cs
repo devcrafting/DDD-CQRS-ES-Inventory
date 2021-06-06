@@ -12,10 +12,10 @@ namespace Infra.Controllers
             _repository = repository;
         }
 
-        public void StartInventory(string zoneId)
+        public void StartInventory(string zoneId, string inventoryId)
         {
             var zoneInventory = _repository.Get(zoneId); // get data required
-            var events = zoneInventory.Start(zoneId); // pure logic
+            var events = zoneInventory.Start(zoneId, inventoryId); // pure logic
             _repository.Save(zoneId, events); // save data (incl. publish events)
         }
     }

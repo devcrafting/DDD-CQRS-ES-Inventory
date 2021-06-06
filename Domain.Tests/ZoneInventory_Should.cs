@@ -13,20 +13,22 @@ namespace Domain.Tests
         public void ReturnZoneInventoryStarted_WhenStartInventory()
         {
             var zoneInventory = new ZoneInventory();
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             
-            var events = zoneInventory.Start(zoneId);
+            var events = zoneInventory.Start(zoneId, inventoryId);
             
-            Check.That(events).ContainsExactly(new ZoneInventoryStarted(zoneId));
+            Check.That(events).ContainsExactly(new ZoneInventoryStarted(zoneId, inventoryId));
         }
         
         [Fact]
         public void ReturnNothing_WhenStartInventoryAnAlreadyStartedInventory()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
-            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId));
+            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId, inventoryId));
             
-            var events = zoneInventory.Start(zoneId);
+            var events = zoneInventory.Start(zoneId, inventoryId);
             
             Check.That(events).IsEmpty();
         }
@@ -34,8 +36,9 @@ namespace Domain.Tests
         [Fact]
         public void ReturnLocationScanned_WhenScanLocation()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
-            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId));
+            var zoneInventory = new ZoneInventory(new ZoneInventoryStarted(zoneId, inventoryId));
             var locationId = Guid.NewGuid().ToString();
             
             var events = zoneInventory.ScanLocation(locationId);
@@ -56,12 +59,13 @@ namespace Domain.Tests
         [Fact]
         public void ReturnItemScanned_WhenScanItem()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
             var itemId = Guid.NewGuid().ToString();
             var quantity = 3;
             var zoneInventory = new ZoneInventory(
-                new ZoneInventoryStarted(zoneId, 
+                new ZoneInventoryStarted(zoneId, inventoryId,
                     new ExpectedItem(locationId, itemId, quantity)),
                 new LocationScanned(zoneId, locationId));
             
@@ -74,9 +78,10 @@ namespace Domain.Tests
         [Fact]
         public void ThrowNoLocationScanned_WhenScanItemWithoutLastLocationScanned()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var zoneInventory = new ZoneInventory(
-                new ZoneInventoryStarted(zoneId));
+                new ZoneInventoryStarted(zoneId, inventoryId));
             var itemId = Guid.NewGuid().ToString();
             var quantity = 3;
             
@@ -87,12 +92,13 @@ namespace Domain.Tests
         [Fact]
         public void ReturnItemNotExpected_WhenScanItem()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
             var expectedItemId = Guid.NewGuid().ToString();
             var expectedItem = new ExpectedItem(locationId, expectedItemId, 3);
             var zoneInventory = new ZoneInventory(
-                new ZoneInventoryStarted(zoneId, expectedItem),
+                new ZoneInventoryStarted(zoneId, inventoryId, expectedItem),
                 new LocationScanned(zoneId, locationId));
             var itemId = Guid.NewGuid().ToString();
             var quantity = 3;
@@ -100,19 +106,20 @@ namespace Domain.Tests
             var events = zoneInventory.ScanItem(itemId, quantity);
             
             Check.That(events).ContainsExactly(
-                new ItemNotExpected(zoneId, expectedItem, itemId, quantity));
+                new ItemNotExpected(inventoryId, zoneId, expectedItem, itemId, quantity));
         }
         
         [Fact]
         public void ReturnQuantityNotExpected_WhenScanItem()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
             var itemId = Guid.NewGuid().ToString();
             var expectedQuantity = 3;
             var expectedItem = new ExpectedItem(locationId, itemId, expectedQuantity);
             var zoneInventory = new ZoneInventory(
-                new ZoneInventoryStarted(zoneId, 
+                new ZoneInventoryStarted(zoneId, inventoryId,
                     expectedItem),
                 new LocationScanned(zoneId, locationId));
             var notExpectedQuantity = 2;

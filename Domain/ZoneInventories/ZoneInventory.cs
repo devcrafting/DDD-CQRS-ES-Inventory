@@ -20,10 +20,10 @@ namespace Domain.ZoneInventories
             _zoneInventoryState = zoneInventoryState;
         }
 
-        public IEnumerable<IDomainEvent> Start(string zoneId)
+        public IEnumerable<IDomainEvent> Start(string zoneId, string inventoryId)
         {
             if (!_zoneInventoryState.Started)
-                yield return new ZoneInventoryStarted(zoneId);
+                yield return new ZoneInventoryStarted(zoneId, inventoryId);
         }
 
         public IEnumerable<IDomainEvent> ScanLocation(string locationId)
@@ -40,7 +40,7 @@ namespace Domain.ZoneInventories
             
             var expectedItem = _zoneInventoryState.ExpectedItems.Single(x => x.LocationId == _zoneInventoryState.LastLocationScanned);
             if (expectedItem.ItemId != itemId)
-                yield return new ItemNotExpected(_zoneInventoryState.ZoneId, expectedItem, itemId, quantity);
+                yield return new ItemNotExpected(_zoneInventoryState.InventoryId, _zoneInventoryState.ZoneId, expectedItem, itemId, quantity);
             else if (expectedItem.Quantity != quantity)
                 yield return new QuantityNotExpected(_zoneInventoryState.ZoneId, expectedItem, quantity);
             else
@@ -49,6 +49,7 @@ namespace Domain.ZoneInventories
 
         public class ZoneInventoryState
         {
+            public string InventoryId { get; private set; }
             public string ZoneId { get; private set; }
             public string LastLocationScanned { get; private set; }
             public IEnumerable<ExpectedItem> ExpectedItems { get; private set; }
@@ -80,11 +81,12 @@ namespace Domain.ZoneInventories
 
             private void Evolve(ZoneInventoryStarted @event)
             {
+                InventoryId = @event.InventoryId;
                 ZoneId = @event.ZoneId;
                 Started = true;
                 ExpectedItems = @event.ExpectedItems ?? Array.Empty<ExpectedItem>();
             }
-
+            
             private void Evolve(LocationScanned @event)
             {
                 LastLocationScanned = @event.LocationId;

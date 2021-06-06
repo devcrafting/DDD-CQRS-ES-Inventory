@@ -12,6 +12,7 @@ namespace Domain.Tests
         public void ReturnMissingItemFoundAndItemDiscovered_WhenReceivingItemNotExpected()
         {
             var inventoryConsolidation = new InventoryConsolidation();
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
             var expectedItemId = Guid.NewGuid().ToString();
@@ -19,7 +20,7 @@ namespace Domain.Tests
             
             var foundItemId = Guid.NewGuid().ToString();
             var foundQuantity = 4;
-            var itemNotExpected = new ItemNotExpected(zoneId, expectedItem, foundItemId, foundQuantity);
+            var itemNotExpected = new ItemNotExpected(inventoryId, zoneId, expectedItem, foundItemId, foundQuantity);
 
             var events = inventoryConsolidation.Analyze(itemNotExpected);
 
@@ -67,6 +68,7 @@ namespace Domain.Tests
         [Fact]
         public void ReturnItemFoundInAnotherLocation_WhenReceivingItemNotExpectedFoundWithMissingSameItemInAnotherLocation()
         {
+            var inventoryId = Guid.NewGuid().ToString();
             var zoneId = Guid.NewGuid().ToString();
             var locationId = Guid.NewGuid().ToString();
             var itemId = Guid.NewGuid().ToString();
@@ -75,7 +77,7 @@ namespace Domain.Tests
             var foundQuantity = 2;
             var anotherLocationId = Guid.NewGuid().ToString();
             var expectedItem = new ExpectedItem(anotherLocationId, itemId, 3);
-            var itemNotExpected = new ItemNotExpected(zoneId, expectedItem, itemId, foundQuantity);
+            var itemNotExpected = new ItemNotExpected(inventoryId, zoneId, expectedItem, itemId, foundQuantity);
 
             var events = inventoryConsolidation.Analyze(itemNotExpected);
 
